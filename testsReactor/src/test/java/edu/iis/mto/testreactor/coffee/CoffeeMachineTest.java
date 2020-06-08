@@ -90,6 +90,18 @@ class CoffeeMachineTest {
         Assertions.assertEquals(IRREVELANT_WATER_AMOUNT, cafe.getWaterAmount());
     }
 
+    @Test
+    void shouldThrowUnsupportedCoffeeExceptionWhenNoRecipe() {
+        CoffeOrder order = createOrder(IRREVELANT_COFFEE_SIZE, IRREVELANT_COFFEE_TYPE);
+
+        Mockito.when(grinder.canGrindFor(IRREVELANT_COFFEE_SIZE)).thenReturn(true);
+        Mockito.when(grinder.grind(IRREVELANT_COFFEE_SIZE)).thenReturn(IRREVELANT_WEIGHT_GR);
+        Mockito.when(recipes.getReceipe(IRREVELANT_COFFEE_TYPE)).thenReturn(Optional.empty());
+
+        Assertions.assertThrows(UnsupportedCoffeeException.class,
+                                () -> coffeeMachine.make(order));
+    }
+    
     private CoffeOrder createOrder(CoffeeSize size, CoffeType type){
         return CoffeOrder.builder().withSize(size).withType(type).build();
     }
