@@ -112,7 +112,7 @@ class CoffeeMachineTest {
     }
 
     @Test
-    void shouldThrowUnsupportedCoffeeSizeExceptionIf() {
+    void shouldThrowUnsupportedCoffeeSizeExceptionIfRecipeDoesNotContainWaterAmountForCoffee() {
         CoffeOrder order = createOrder(IRREVELANT_COFFEE_SIZE, IRREVELANT_COFFEE_TYPE);
         CoffeeReceipe recipe = CoffeeReceipe.builder().withMilkAmount(IRREVELANT_MILK_AMOUNT).build();
 
