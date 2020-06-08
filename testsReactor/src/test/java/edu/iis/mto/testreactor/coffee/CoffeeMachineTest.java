@@ -29,7 +29,6 @@ class CoffeeMachineTest {
     private final double IRREVELANT_WEIGHT_GR = 5.0;
     private final int ZERO = 0;
 
-
     @BeforeAll
     public static void init() {
         coffeeMachine = new CoffeeMachine(grinder, milkProvider, recipes);
@@ -101,7 +100,17 @@ class CoffeeMachineTest {
         Assertions.assertThrows(UnsupportedCoffeeException.class,
                                 () -> coffeeMachine.make(order));
     }
-    
+
+    @Test
+    void shouldThrowNoCoffeeBeansExceptionIfCantGrind() {
+        CoffeOrder order = createOrder(IRREVELANT_COFFEE_SIZE, IRREVELANT_COFFEE_TYPE);
+
+        Mockito.when(grinder.canGrindFor(IRREVELANT_COFFEE_SIZE)).thenReturn(false);
+
+        Assertions.assertThrows(NoCoffeeBeansException.class,
+                () -> coffeeMachine.make(order));
+    }
+
     private CoffeOrder createOrder(CoffeeSize size, CoffeType type){
         return CoffeOrder.builder().withSize(size).withType(type).build();
     }
