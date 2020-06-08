@@ -1,7 +1,7 @@
 package edu.iis.mto.testreactor.coffee;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.*;
 
 import edu.iis.mto.testreactor.coffee.milkprovider.MilkProvider;
 import edu.iis.mto.testreactor.coffee.milkprovider.MilkProviderException;
@@ -27,6 +27,7 @@ class CoffeeMachineTest {
     private final int IRREVELANT_MILK_AMOUNT = 1;
     private final int IRREVELANT_WATER_AMOUNT = 3;
     private final double IRREVELANT_WEIGHT_GR = 5.0;
+    private final int ZERO = 0;
 
 
     @BeforeAll
@@ -61,6 +62,7 @@ class CoffeeMachineTest {
         CoffeeReceipe recipe = createRecipe(IRREVELANT_MILK_AMOUNT, IRREVELANT_COFFEE_SIZE, IRREVELANT_WATER_AMOUNT);
 
         Mockito.when(grinder.canGrindFor(IRREVELANT_COFFEE_SIZE)).thenReturn(true);
+        Mockito.when(grinder.grind(IRREVELANT_COFFEE_SIZE)).thenReturn(IRREVELANT_WEIGHT_GR);
         Mockito.when(recipes.getReceipe(IRREVELANT_COFFEE_TYPE)).thenReturn(Optional.of(recipe));
 
         Coffee cafe = coffeeMachine.make(order);
@@ -73,11 +75,26 @@ class CoffeeMachineTest {
         callOrder.verify(milkProvider).pour(IRREVELANT_MILK_AMOUNT);
     }
 
+    @Test
+    void shouldMakeCoffeeWithoutMilk(){
+        CoffeOrder order = createOrder(IRREVELANT_COFFEE_SIZE, IRREVELANT_COFFEE_TYPE);
+        CoffeeReceipe recipe = createRecipe(ZERO, IRREVELANT_COFFEE_SIZE, IRREVELANT_WATER_AMOUNT);
+
+        Mockito.when(grinder.canGrindFor(IRREVELANT_COFFEE_SIZE)).thenReturn(true);
+        Mockito.when(grinder.grind(IRREVELANT_COFFEE_SIZE)).thenReturn(IRREVELANT_WEIGHT_GR);
+        Mockito.when(recipes.getReceipe(IRREVELANT_COFFEE_TYPE)).thenReturn(Optional.of(recipe));
+
+        Coffee cafe = coffeeMachine.make(order);
+        Assertions.assertFalse(cafe.getMilkAmout().isPresent());
+        Assertions.assertEquals(IRREVELANT_WEIGHT_GR, cafe.getCoffeeWeigthGr());
+        Assertions.assertEquals(IRREVELANT_WATER_AMOUNT, cafe.getWaterAmount());
+    }
+
     private CoffeOrder createOrder(CoffeeSize size, CoffeType type){
         return CoffeOrder.builder().withSize(size).withType(type).build();
     }
 
-    private CoffeeReceipe createRecipe(int milkAmount, CoffeeSize size, int waterAmout){
-        return CoffeeReceipe.builder().withMilkAmount(milkAmount).withWaterAmounts(Map.of(size, waterAmout)).build();
+    private CoffeeReceipe createRecipe(int milkAmount, CoffeeSize size, int waterAmount){
+        return CoffeeReceipe.builder().withMilkAmount(milkAmount).withWaterAmounts(Map.of(size, waterAmount)).build();
     }
 }
